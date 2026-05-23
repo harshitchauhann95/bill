@@ -17,7 +17,7 @@
 
       <nav class="tabs-navigation">
         <button class="tab-btn active" data-tab="shop-setup">🏪 Shop Setup</button>
-        <button class="tab-btn disabled" data-tab="inventory-master" title="Unlocked in Stage 3" disabled>📦 Inventory Master <span class="badge-locked">Locked</span></button>
+        <button class="tab-btn" data-tab="inventory-master">📦 Inventory Master</button>
         <button class="tab-btn disabled" data-tab="billing-desk" title="Unlocked in Stage 4" disabled>🛒 Billing Desk <span class="badge-locked">Locked</span></button>
       </nav>
     </header>
@@ -68,19 +68,84 @@
         </div>
       </section>
 
-      <!-- STAGE 3: INVENTORY MASTER PANEL (LOCKED IN STAGE 2) -->
+      <!-- STAGE 3: INVENTORY MASTER PANEL -->
       <section id="inventory-master" class="panel">
-        <div class="glass-card">
-          <div class="locked-container">
-            <div class="locked-icon">🔒</div>
-            <h3>Inventory Master Module</h3>
-            <p>Define your products database, manage stock levels, and assign barcodes. This feature is part of Stage 3: Inventory Master Module Sprint.</p>
-            <span class="badge-locked">Stage 3 Sprint</span>
+        <div class="split-layout">
+          <!-- Left Column: Add/Edit Product -->
+          <div class="glass-card">
+            <h2 class="card-title" id="form-title">📦 Add Product</h2>
+            <form id="product-form">
+              <input type="hidden" id="productId">
+              <div class="form-grid">
+                <div class="form-group form-full-width">
+                  <label for="prodName">Product Name</label>
+                  <input type="text" id="prodName" placeholder="e.g. Quantum Sensors" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="prodPrice">Price (Base)</label>
+                  <input type="number" step="0.01" id="prodPrice" placeholder="0.00" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="prodStock">Stock Level</label>
+                  <input type="number" id="prodStock" placeholder="0" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="prodBarcode">Barcode (IoT Scanner)</label>
+                  <input type="text" id="prodBarcode" placeholder="e.g. 890123456789">
+                </div>
+
+                <div class="form-group">
+                  <label for="prodCategory">Category</label>
+                  <select id="prodCategory">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Sensors">Sensors</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="General">General</option>
+                  </select>
+                </div>
+
+                <div class="form-full-width" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                  <button type="submit" class="btn-primary" style="flex: 1;">💾 Save Product</button>
+                  <button type="button" class="btn-secondary" id="btn-cancel-edit" style="display: none;">Cancel</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right Column: Product List -->
+          <div class="glass-card">
+            <div class="table-header-controls">
+              <h2 class="card-title" style="margin-bottom: 0;">📦 Product Database</h2>
+              <div class="search-box">
+                <input type="text" id="searchProduct" placeholder="Search by name or scan barcode...">
+              </div>
+            </div>
+            
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product Details</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock Status</th>
+                    <th>Barcode</th>
+                    <th style="width: 80px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- STAGE 4: BILLING & PRINTING DESK (LOCKED IN STAGE 2) -->
+      <!-- STAGE 4: BILLING & PRINTING DESK (LOCKED IN STAGE 3) -->
       <section id="billing-desk" class="panel">
         <div class="glass-card">
           <div class="locked-container">
@@ -102,17 +167,25 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="shop-config.js"></script>
+  <script src="inventory.js"></script>
   <script>
-    // App Initialization & Tab Handler for Stage 2
     document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('shop-config-form');
+      // Global Elements
       const toastContainer = document.getElementById('toast-container');
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panels = document.querySelectorAll('.panel');
 
       // Toast Notification Helper
-      function showToast(message) {
+      function showToast(message, type = 'success') {
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.innerHTML = `🟢 ${message}`;
+        if (type === 'danger') {
+          toast.style.borderColor = 'var(--accent-red)';
+          toast.style.borderLeftColor = 'var(--accent-red)';
+          toast.innerHTML = `🔴 ${message}`;
+        } else {
+          toast.innerHTML = `🟢 ${message}`;
+        }
         toastContainer.appendChild(toast);
 
         setTimeout(() => {
@@ -121,16 +194,31 @@
         }, 3000);
       }
 
-      // Load configuration on startup
-      const config = ShopConfig.load();
-      document.getElementById('shopName').value = config.shopName || '';
-      document.getElementById('phone').value = config.phone || '';
-      document.getElementById('address').value = config.address || '';
-      document.getElementById('gstNumber').value = config.gstNumber || '';
-      document.getElementById('currency').value = config.currency || 'INR';
+      // Tab Navigation Switcher
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          if (tab.classList.contains('disabled')) return;
+          
+          tabs.forEach(t => t.classList.remove('active'));
+          panels.forEach(p => p.classList.remove('active'));
 
-      // Save form handler
-      form.addEventListener('submit', (e) => {
+          tab.classList.add('active');
+          const targetPanel = document.getElementById(tab.dataset.tab);
+          if (targetPanel) targetPanel.classList.add('active');
+        });
+      });
+
+      /* ── STAGE 2: Shop Settings Logic ── */
+      const shopForm = document.getElementById('shop-config-form');
+      const shopConfig = ShopConfig.load();
+      
+      document.getElementById('shopName').value = shopConfig.shopName || '';
+      document.getElementById('phone').value = shopConfig.phone || '';
+      document.getElementById('address').value = shopConfig.address || '';
+      document.getElementById('gstNumber').value = shopConfig.gstNumber || '';
+      document.getElementById('currency').value = shopConfig.currency || 'INR';
+
+      shopForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const updatedConfig = {
           shopName: document.getElementById('shopName').value,
@@ -142,6 +230,134 @@
         ShopConfig.save(updatedConfig);
         showToast('Shop Settings persisted successfully!');
       });
+
+      /* ── STAGE 3: Inventory Logic ── */
+      const productForm = document.getElementById('product-form');
+      const productIdInput = document.getElementById('productId');
+      const prodNameInput = document.getElementById('prodName');
+      const prodPriceInput = document.getElementById('prodPrice');
+      const prodStockInput = document.getElementById('prodStock');
+      const prodBarcodeInput = document.getElementById('prodBarcode');
+      const prodCategoryInput = document.getElementById('prodCategory');
+      const inventoryTableBody = document.getElementById('inventory-table-body');
+      const searchProductInput = document.getElementById('searchProduct');
+      const btnCancelEdit = document.getElementById('btn-cancel-edit');
+      const formTitle = document.getElementById('form-title');
+
+      // Add default mock products if empty to make UI look gorgeous on start
+      if (InventoryMaster.getAll().length === 0) {
+        InventoryMaster.add({ name: 'Lora Transceiver Node', price: 850.00, stock: 45, barcode: '89010111', category: 'Electronics' });
+        InventoryMaster.add({ name: 'DHT22 Humidity Sensor', price: 220.00, stock: 5, barcode: '89010112', category: 'Sensors' });
+        InventoryMaster.add({ name: 'Raspberry Pi 4 Model B', price: 4200.00, stock: 0, barcode: '89010113', category: 'Electronics' });
+      }
+
+      function renderInventory(query = '') {
+        const products = InventoryMaster.search(query);
+        inventoryTableBody.innerHTML = '';
+
+        if (products.length === 0) {
+          inventoryTableBody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                No products found. Add a product to get started.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        products.forEach(p => {
+          const price = parseFloat(p.price).toFixed(2);
+          
+          let stockBadge = '';
+          if (p.stock <= 0) {
+            stockBadge = `<span class="badge-stock out">Out of Stock (${p.stock})</span>`;
+          } else if (p.stock <= 10) {
+            stockBadge = `<span class="badge-stock low">Low Stock (${p.stock})</span>`;
+          } else {
+            stockBadge = `<span class="badge-stock in">In Stock (${p.stock})</span>`;
+          }
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <div style="font-weight: 700;">${p.name}</div>
+            </td>
+            <td><span class="category-tag">${p.category}</span></td>
+            <td style="font-family: var(--font-mono); font-weight: bold;">₹${price}</td>
+            <td>${stockBadge}</td>
+            <td style="font-family: var(--font-mono); color: var(--text-muted);">${p.barcode || 'N/A'}</td>
+            <td>
+              <div style="display: flex; gap: 0.25rem;">
+                <button class="btn-action-icon edit-btn" data-id="${p.id}" title="Edit Product">✏️</button>
+                <button class="btn-danger-icon delete-btn" data-id="${p.id}" title="Delete Product">🗑️</button>
+              </div>
+            </td>
+          `;
+
+          // Edit Action Handler
+          tr.querySelector('.edit-btn').addEventListener('click', () => {
+            productIdInput.value = p.id;
+            prodNameInput.value = p.name;
+            prodPriceInput.value = p.price;
+            prodStockInput.value = p.stock;
+            prodBarcodeInput.value = p.barcode || '';
+            prodCategoryInput.value = p.category;
+
+            formTitle.innerHTML = '✏️ Edit Product';
+            btnCancelEdit.style.display = 'inline-block';
+            prodNameInput.focus();
+          });
+
+          // Delete Action Handler
+          tr.querySelector('.delete-btn').addEventListener('click', () => {
+            if (confirm(`Are you sure you want to delete ${p.name}?`)) {
+              InventoryMaster.delete(p.id);
+              showToast('Product removed from database.', 'danger');
+            }
+          });
+
+          inventoryTableBody.appendChild(tr);
+        });
+      }
+
+      // Handle Product Add/Edit Form submit
+      productForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = productIdInput.value;
+        const productData = {
+          name: prodNameInput.value,
+          price: parseFloat(prodPriceInput.value),
+          stock: parseInt(prodStockInput.value),
+          barcode: prodBarcodeInput.value,
+          category: prodCategoryInput.value,
+        };
+
+        if (id) {
+          InventoryMaster.update(id, productData);
+          showToast('Product details updated successfully!');
+          resetProductForm();
+        } else {
+          InventoryMaster.add(productData);
+          showToast('Product registered in database!');
+          resetProductForm();
+        }
+      });
+
+      function resetProductForm() {
+        productForm.reset();
+        productIdInput.value = '';
+        formTitle.innerHTML = '📦 Add Product';
+        btnCancelEdit.style.display = 'none';
+      }
+
+      btnCancelEdit.addEventListener('click', resetProductForm);
+      searchProductInput.addEventListener('input', (e) => renderInventory(e.target.value));
+
+      document.addEventListener('inventory:updated', () => renderInventory(searchProductInput.value));
+
+      // Initial Inventory Render
+      renderInventory();
     });
   </script>
 </body>
