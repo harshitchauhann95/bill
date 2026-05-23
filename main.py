@@ -38,7 +38,7 @@ class POSApp(ctk.CTk):
         self.configure_treeview_styles()
         
         # Create Tab View Container
-        self.tabview = ctk.CTkTabview(self, segmented_button_fg="#0f1626", segmented_button_selected_color="#00d2ff", segmented_button_selected_hover_color="#00b4db")
+        self.tabview = ctk.CTkTabview(self, segmented_button_fg_color="#0f1626", segmented_button_selected_color="#00d2ff", segmented_button_selected_hover_color="#00b4db")
         self.tabview.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
         
         self.tab_billing = self.tabview.add("🛒 Daily Billing")
@@ -109,14 +109,14 @@ class POSApp(ctk.CTk):
         left_frame.grid_columnconfigure(0, weight=1)
         
         # Autocomplete search bar container
-        search_container = ctk.CTkFrame(left_frame, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        search_container = ctk.CTkFrame(left_frame, fg_color="#0f1626", border_width=1, border_color="#20293a")
         search_container.grid(row=0, column=0, padx=0, pady=(0, 10), sticky="ew")
         search_container.grid_columnconfigure(0, weight=1)
         
         search_label = ctk.CTkLabel(search_container, text="🔍 SCAN OR SEARCH PRODUCT NAME (Press Down to list / Enter to add)", font=("Outfit", 10, "bold"), text_color="#8d99ae")
         search_label.grid(row=0, column=0, padx=12, pady=(8, 2), sticky="w")
         
-        self.billing_search_entry = ctk.CTkEntry(search_container, height=45, placeholder_text="Type product name or scan barcode...", font=("Outfit", 14), fg_color="#17223b", border_color="rgba(255,255,255,0.1)")
+        self.billing_search_entry = ctk.CTkEntry(search_container, height=45, placeholder_text="Type product name or scan barcode...", font=("Outfit", 14), fg_color="#17223b", border_color="#253047")
         self.billing_search_entry.grid(row=1, column=0, padx=12, pady=(0, 10), sticky="ew")
         
         # Bind keyboard search events
@@ -143,7 +143,7 @@ class POSApp(ctk.CTk):
         self.billing_listbox.bind("<Escape>", self.hide_billing_search_listbox)
         
         # Active Cart Grid
-        cart_card = ctk.CTkFrame(left_frame, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        cart_card = ctk.CTkFrame(left_frame, fg_color="#0f1626", border_width=1, border_color="#20293a")
         cart_card.grid(row=1, column=0, padx=0, pady=0, sticky="nsew")
         cart_card.grid_rowconfigure(1, weight=1)
         cart_card.grid_columnconfigure(0, weight=1)
@@ -171,7 +171,7 @@ class POSApp(ctk.CTk):
         cart_scroll.grid(row=1, column=1, sticky="ns", pady=(0, 15), padx=(0, 5))
         
         # --- RIGHT SIDE: SUMMARY MATHS & CONTROLS ---
-        right_frame = ctk.CTkFrame(self.tab_billing, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        right_frame = ctk.CTkFrame(self.tab_billing, fg_color="#0f1626", border_width=1, border_color="#20293a")
         right_frame.grid(row=0, column=1, padx=(10, 0), pady=0, sticky="nsew")
         right_frame.grid_rowconfigure(4, weight=1) # expand empty space
         right_frame.grid_columnconfigure(0, weight=1)
@@ -207,11 +207,11 @@ class POSApp(ctk.CTk):
         self.lbl_sgst.grid(row=3, column=1, sticky="e", pady=5)
         
         # Divider line
-        divider = ctk.CTkFrame(right_frame, height=2, fg_color="rgba(255,255,255,0.08)")
+        divider = ctk.CTkFrame(right_frame, height=2, fg_color="#20293a")
         divider.grid(row=2, column=0, padx=20, pady=15, sticky="ew")
         
         # Grand Total Display
-        totals_box = ctk.CTkFrame(right_frame, fg_color="rgba(0, 210, 255, 0.05)", border_width=1, border_color="rgba(0, 210, 255, 0.2)")
+        totals_box = ctk.CTkFrame(right_frame, fg_color="#0e1c31", border_width=1, border_color="#0d3a51")
         totals_box.grid(row=3, column=0, padx=20, pady=0, sticky="ew")
         totals_box.grid_columnconfigure(1, weight=1)
         
@@ -243,8 +243,8 @@ class POSApp(ctk.CTk):
             font=("Outfit", 12, "bold"),
             fg_color="transparent",
             border_width=1,
-            border_color="rgba(217, 4, 41, 0.4)",
-            hover_color="rgba(217, 4, 41, 0.1)",
+            border_color="#600f27",
+            hover_color="#220e18",
             text_color="#d90429",
             command=self.clear_cart_session
         )
@@ -263,7 +263,7 @@ class POSApp(ctk.CTk):
         self.tab_inventory.grid_columnconfigure(1, weight=3) # Product list
         
         # --- LEFT SIDE: ADD/EDIT FORM ---
-        form_frame = ctk.CTkFrame(self.tab_inventory, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        form_frame = ctk.CTkFrame(self.tab_inventory, fg_color="#0f1626", border_width=1, border_color="#20293a")
         form_frame.grid(row=0, column=0, padx=(0, 10), pady=0, sticky="nsew")
         form_frame.grid_columnconfigure(0, weight=1)
         
@@ -295,12 +295,12 @@ class POSApp(ctk.CTk):
         self.btn_save_prod = ctk.CTkButton(btn_inner, text="💾 Save Product", font=("Outfit", 12, "bold"), fg_color="#38b000", hover_color="#38b000", command=self.on_inventory_save_click)
         self.btn_save_prod.grid(row=0, column=0, padx=(0, 5), sticky="ew")
         
-        self.btn_cancel_prod_edit = ctk.CTkButton(btn_inner, text="Cancel", font=("Outfit", 12), fg_color="transparent", border_width=1, border_color="rgba(255,255,255,0.15)", text_color="#f8f9fa", command=self.exit_inventory_edit_mode)
+        self.btn_cancel_prod_edit = ctk.CTkButton(btn_inner, text="Cancel", font=("Outfit", 12), fg_color="transparent", border_width=1, border_color="#334155", text_color="#f8f9fa", command=self.exit_inventory_edit_mode)
         self.btn_cancel_prod_edit.grid(row=0, column=1, padx=(5, 0), sticky="ew")
         self.btn_cancel_prod_edit.grid_remove() # Hidden by default
         
         # --- RIGHT SIDE: DATABASE LIST & FILTER ---
-        grid_frame = ctk.CTkFrame(self.tab_inventory, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        grid_frame = ctk.CTkFrame(self.tab_inventory, fg_color="#0f1626", border_width=1, border_color="#20293a")
         grid_frame.grid(row=0, column=1, padx=(10, 0), pady=0, sticky="nsew")
         grid_frame.grid_rowconfigure(2, weight=1)
         grid_frame.grid_columnconfigure(0, weight=1)
@@ -343,7 +343,7 @@ class POSApp(ctk.CTk):
         self.btn_edit_selected = ctk.CTkButton(grid_actions, text="✏️ Edit Selected", font=("Outfit", 12, "bold"), fg_color="#00d2ff", text_color="#080c14", hover_color="#00b4db", command=self.on_inventory_edit_click)
         self.btn_edit_selected.grid(row=0, column=0, padx=(0, 5), sticky="ew")
         
-        self.btn_delete_selected = ctk.CTkButton(grid_actions, text="🗑️ Delete Selected", font=("Outfit", 12, "bold"), fg_color="transparent", border_width=1, border_color="#d90429", text_color="#d90429", hover_color="rgba(217, 4, 41, 0.1)", command=self.on_inventory_delete_click)
+        self.btn_delete_selected = ctk.CTkButton(grid_actions, text="🗑️ Delete Selected", font=("Outfit", 12, "bold"), fg_color="transparent", border_width=1, border_color="#d90429", text_color="#d90429", hover_color="#220e18", command=self.on_inventory_delete_click)
         self.btn_delete_selected.grid(row=0, column=1, padx=(5, 0), sticky="ew")
         
         # Status Label bar for inventory
@@ -357,7 +357,7 @@ class POSApp(ctk.CTk):
         self.tab_settings.grid_rowconfigure(0, weight=1)
         self.tab_settings.grid_columnconfigure(0, weight=1)
         
-        container = ctk.CTkFrame(self.tab_settings, fg_color="#0f1626", border_width=1, border_color="rgba(255,255,255,0.08)")
+        container = ctk.CTkFrame(self.tab_settings, fg_color="#0f1626", border_width=1, border_color="#20293a")
         container.grid(row=0, column=0, padx=50, pady=30, sticky="nsew")
         container.grid_columnconfigure(0, weight=1)
         container.grid_columnconfigure(1, weight=1)
