@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IoT Billing Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <div class="logo-section">
+        <h1>🧾 IoT Billing Machine <span class="badge-iot">POS Engine</span></h1>
+        <p>Offline-First Retail POS & Billing System</p>
+      </div>
+
+      <nav class="tabs-navigation">
+        <button class="tab-btn active" data-tab="shop-setup">🏪 Shop Setup</button>
+        <button class="tab-btn disabled" data-tab="inventory-master" title="Unlocked in Stage 3" disabled>📦 Inventory Master <span class="badge-locked">Locked</span></button>
+        <button class="tab-btn disabled" data-tab="billing-desk" title="Unlocked in Stage 4" disabled>🛒 Billing Desk <span class="badge-locked">Locked</span></button>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      
+      <!-- STAGE 2: SHOP CONFIGURATION PANEL -->
+      <section id="shop-setup" class="panel active">
+        <div class="glass-card">
+          <h2 class="card-title">🏪 Shop Settings Configuration</h2>
+          <form id="shop-config-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="shopName">Shop Name</label>
+                <input type="text" id="shopName" placeholder="e.g. Aether IoT Labs" required>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" placeholder="e.g. +91 98765 43210" required>
+              </div>
+
+              <div class="form-group form-full-width">
+                <label for="address">Shop Address</label>
+                <textarea id="address" placeholder="Enter complete physical address" required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="gstNumber">GSTIN / Tax ID</label>
+                <input type="text" id="gstNumber" placeholder="e.g. 29AAAAA0000A1Z5" required>
+              </div>
+
+              <div class="form-group">
+                <label for="currency">Currency Code</label>
+                <select id="currency">
+                  <option value="INR">INR (₹)</option>
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                </select>
+              </div>
+
+              <div class="form-full-width" style="margin-top: 1rem;">
+                <button type="submit" class="btn-primary">💾 Save Configuration</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- STAGE 3: INVENTORY MASTER PANEL (LOCKED IN STAGE 2) -->
+      <section id="inventory-master" class="panel">
+        <div class="glass-card">
+          <div class="locked-container">
+            <div class="locked-icon">🔒</div>
+            <h3>Inventory Master Module</h3>
+            <p>Define your products database, manage stock levels, and assign barcodes. This feature is part of Stage 3: Inventory Master Module Sprint.</p>
+            <span class="badge-locked">Stage 3 Sprint</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 4: BILLING & PRINTING DESK (LOCKED IN STAGE 2) -->
+      <section id="billing-desk" class="panel">
+        <div class="glass-card">
+          <div class="locked-container">
+            <div class="locked-icon">🔒</div>
+            <h3>Billing & Printing Desk</h3>
+            <p>Generate smart digital bills, compute GST, discounts, and print to 80mm thermal printers. This feature is part of Stage 4: Billing & Printing Desk Sprint.</p>
+            <span class="badge-locked">Stage 4 Sprint</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      <p>IoT Billing Machine &copy; 2026. Made with ❤️ for Shop Owners.</p>
+    </footer>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="shop-config.js"></script>
+  <script>
+    // App Initialization & Tab Handler for Stage 2
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('shop-config-form');
+      const toastContainer = document.getElementById('toast-container');
+
+      // Toast Notification Helper
+      function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `🟢 ${message}`;
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add('fade-out');
+          toast.addEventListener('animationend', () => toast.remove());
+        }, 3000);
+      }
+
+      // Load configuration on startup
+      const config = ShopConfig.load();
+      document.getElementById('shopName').value = config.shopName || '';
+      document.getElementById('phone').value = config.phone || '';
+      document.getElementById('address').value = config.address || '';
+      document.getElementById('gstNumber').value = config.gstNumber || '';
+      document.getElementById('currency').value = config.currency || 'INR';
+
+      // Save form handler
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const updatedConfig = {
+          shopName: document.getElementById('shopName').value,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          gstNumber: document.getElementById('gstNumber').value,
+          currency: document.getElementById('currency').value,
+        };
+        ShopConfig.save(updatedConfig);
+        showToast('Shop Settings persisted successfully!');
+      });
+    });
+  </script>
+</body>
+</html>
