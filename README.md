@@ -1,68 +1,55 @@
-# 🧾 IoT Billing Machine
+# 🧾 Aether IoT Labs - Desktop Billing Desk (POS)
 
-> A modular, offline-first, browser-based Point-of-Sale (POS) system for shop owners — featuring shop configuration, inventory management, GST-compliant billing, and 80mm thermal receipt printing.
-
----
-
-## 🗂️ Module Architecture
-
-| Module              | Branch                    | Status        | Description                         |
-|---------------------|---------------------------|---------------|-------------------------------------|
-| Shop Configuration  | `feature/shop-setup`      | ✅ Merged     | Shop identity & localStorage layer  |
-| Inventory Master    | `feature/inventory-master`| ✅ Merged     | Product CRUD with barcode search    |
-| Billing Desk        | `feature/billing-desk`    | ✅ Merged     | Cart engine, GST math, 80mm print   |
+> An offline-first, native Python desktop Point of Sale (POS) system designed for 80mm thermal receipt printers. Optimized for keyboard-only operations with robust local SQLite persistence.
 
 ---
 
-## 🚀 Local Setup
+## 🎨 Design Spec & Key features
 
-```bash
-git clone https://github.com/harshitchauhann95/bill.git
-cd bill
-open index.html       # macOS
-# OR: xdg-open index.html  # Linux
-```
-
-> No build step required. Pure HTML + JS + CSS — runs entirely in the browser.
+- **⌨️ Keyboard-Only Navigation:** Autocomplete input box, arrow-key navigation, instant enter selection, and globally bound F12 checkout.
+- **⚡ Offline-First Architecture:** Complete data integrity backed by a local SQLite ledger database (`pos_billing.db`).
+- **🏬 Shop Settings Configuration:** Persisted shop metadata populates invoice headers in real-time.
+- **📦 Inventory Master Database:** Add, update, search, and delete catalog items with interactive dropdown tax slabs.
+- **🛒 Dynamic Sales Checkout:** Real-time billing math engine with CGST/SGST tax back-calculation split (50/50) and flat discounts.
+- **🖨️ 80mm Monospace Spooling:** Spools direct to default printing spooler or falls back seamlessly to `receipt.txt` formatting.
 
 ---
 
-## 🌿 Git-Flow Strategy
+## 🛠️ Stack & Dependencies
 
-```
-main              ← Production trunk (no direct commits)
- ├── feature/shop-setup
- ├── feature/inventory-master
- └── feature/billing-desk
-```
-
-- **`main`** — pristine, production-verified only
-- **`feature/*`** — isolated sprint development
-- **All merges** via `--no-ff` to preserve topology
+- **GUI Framework:** `customtkinter` (Modern Tkinter dark/light window wrap)
+- **Database Engine:** `sqlite3` (Python standard library)
+- **Printing API:** `win32print` / `win32ui` (Windows) or `lp` command line spooling utility (macOS / Linux)
 
 ---
 
-## 🧾 Features
+## 🚀 Setup & Launch
 
-- 🏪 **Shop Config** — Name, address, GST number, currency, phone (localStorage)
-- 📦 **Inventory Master** — Add / Edit / Delete products, barcode scanner ready
-- 🛒 **Billing Desk** — Smart cart, quantity control, discount + 18% GST
-- 🖨️ **80mm Thermal Print** — Receipt-optimized CSS for Epson / TVS / Gprinter
+1. **Clone and Install dependencies:**
+   ```bash
+   git clone https://github.com/harshitchauhann95/bill.git
+   cd bill
+   pip3 install customtkinter
+   ```
 
----
-
-## 📋 Commit Convention
-
-| Prefix      | Purpose                          |
-|-------------|----------------------------------|
-| `feat`      | New feature                      |
-| `fix`       | Bug fix                          |
-| `chore`     | Tooling / scaffolding            |
-| `style`     | UI/CSS only, no logic change     |
-| `refactor`  | Restructure without behavior δ   |
-| `docs`      | Documentation only               |
+2. **Launch the POS Engine:**
+   ```bash
+   python3 main.py
+   ```
 
 ---
 
-**Version:** `v1.0.0`  
+## ⌨️ Hotkeys Reference
+
+| Key Event | Action | Focus context |
+|---|---|---|
+| **`F12`** | Save Invoice & Print thermal slip | Global |
+| **`Down Arrow`** | Open autocomplete options dropdown | Search Bar |
+| **`Enter / Return`** | Add item from autocomplete lists to cart | Search / Dropdown |
+| **`+` / `=`** | Increment quantity by 1 | Cart Selected Row |
+| **`-` / `_`** | Decrement quantity by 1 (Remove if 0) | Cart Selected Row |
+
+---
+
+**Version:** `v2.0.0` (Python Refactor)  
 **License:** MIT
